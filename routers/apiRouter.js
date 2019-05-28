@@ -1,6 +1,7 @@
 const express = require('express');
 const Router = express.Router;
 const apiRouter = Router();
+const jwt = require('jsonwebtoken');
 
 const authRouter = require('../routers/authRouter');
 const userRouter = require('../routers/userRouter');
@@ -13,8 +14,16 @@ apiRouter.use('/auth',authRouter);
 //authorization
 
 apiRouter.use((req,res,next) => {
-    if(req.session.userInfo) {
-        next();
+    const token = req.body.token || req.headers.token || req.query.token;
+    if(token) {
+        const user = jwt.verify(token,"aaaa")
+        if(user){
+            req.user = user
+            next();
+        }
+        else {
+            res.status(401).send({success: 0,message:"ban chua dang nhap"})
+        }
     }
     else {
         res.status(401).send({success: 0,message:"ban chua dang nhap"})

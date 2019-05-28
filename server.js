@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 
 // Import router api
@@ -21,6 +22,13 @@ mongoose.connect(
     }
 );
 
+var corsOptionsDelegate = function (req, callback) {
+    var corsOptions;
+    corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+    callback(null, corsOptions) // callback expects two parameters: error and options
+  }
+  
+app.use(cors(corsOptionsDelegate));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
@@ -38,6 +46,7 @@ app.use(session({
 
 
 // Routes
+
 
 app.use((req,res,next)=>{
 	next();

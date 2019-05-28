@@ -11,7 +11,7 @@ const OrderModel = require('../models/order');
 // feature
 //1. create fake db productModel
 productRouter.get('/addProduct', (req, res) => {
-    
+       
     var category = ['vape', 'tinhDau', 'pods', 'tankVape', 'phuKien'];
     var brand = ['joyetech', 'eleaf', 'widmec', 'smoant', 'wismec'];
     for (i = 0; i < 10; i++) {
@@ -34,7 +34,7 @@ productRouter.get('/addProduct', (req, res) => {
 // find all product 
 
 productRouter.get('/all_product', (req, res) => {
-    ProductInfoModel.find({}, (err, allProduct) => {
+    ProductModel.find({}, (err, allProduct) => {
         if(err) res.json({success: 0, message: 'not found'});
         else res.json({success: 1, message: allProduct})
     })
@@ -81,13 +81,15 @@ productRouter.get('/detail/:id',(req, res) => {
 
 //6.add to cart
 productRouter.get('/detail/:id/:quantity', (req, res) => {
+    var user = req.user.userFound
+    console.log(user)
     var idProduct = req.params.id;
     var quantity = req.params.quantity;
     ProductModel.findOne({_id : idProduct}, (err, productFound) => {
         if (err) res.json({ success: 0, message: 'Product not found!' })
         else {
             var price = productFound.price;
-            OrderModel.findOne({ 'user': req.session.userInfo._id, 'status': '0' }, (err1, orderFound) => {
+            OrderModel.findOne({ 'user': user, 'status': '0' }, (err1, orderFound) => {
                 if (err1) res.json({ success: 0, message: 'Order not found!' })
                 else {
                     // khi không có giỏ hàng => tạo 
@@ -96,13 +98,13 @@ productRouter.get('/detail/:id/:quantity', (req, res) => {
                             product: productFound, 
                             quantity: quantity,
                             status: '0',
-                            user: req.session.userInfo._id
+                            user: user._id
                         };
                         ProductInfoModel.create(productInfoData, (err2, productInfoCreated) => {
                             if(err2) res.json({success: 0, message: 'Creating ProductInfo Fail!'});
                             else {
                                 var orderData = {
-                                    user: req.session.userInfo._id,
+                                    user: user._id,
                                     productInfo: productInfoCreated._id,
                                     cost: price * quantity,
                                     address: '',
@@ -118,7 +120,7 @@ productRouter.get('/detail/:id/:quantity', (req, res) => {
                         })
                     } 
                     else { // khi đã tồn tại giỏ hàng thì chỉ thêm đồ vào 
-                        ProductInfoModel.findOne({ 'product': productFound, 'user': req.session.userInfo._id, 'status': '0' }, (err2, productInfoFound) => {
+                        ProductInfoModel.findOne({ 'product': productFound, 'user': user._id, 'status': '0' }, (err2, productInfoFound) => {
                             if (err2) res.json({ success: 0, message: 'ProductInfo not found!' })
                             else {
                                 if (productInfoFound == null) {
@@ -127,7 +129,7 @@ productRouter.get('/detail/:id/:quantity', (req, res) => {
                                         product: productFound, 
                                         quantity: quantity,
                                         status: '0',
-                                        user: req.session.userInfo._id
+                                        user: user._id
                                     };
                                     ProductInfoModel.create(productInfoData, (err3, productInfoCreated) => {
                                         if(err3) res.json({success: 0, message: 'Creating ProductInfo Fail!'});
@@ -147,7 +149,7 @@ productRouter.get('/detail/:id/:quantity', (req, res) => {
                                         product: productFound, 
                                         quantity: `${ Number(productInfoFound.quantity) + Number(quantity) }`,
                                         status: '0',
-                                        user: req.session.userInfo._id
+                                        user: user._id
                                     };
                                     ProductInfoModel.findByIdAndUpdate(productInfoFound._id, { $set: productInfoData }, (err3, ProductInfoUpdated) => {
                                         if (err3) res.json({ success: 0, message: 'ProductInfo updated fail' });
