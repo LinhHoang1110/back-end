@@ -43,6 +43,13 @@ productRouter.get('/searchProductById', (req, res) => {
     })
 })
 
+// all product 
+productRouter.get('/showAll', (req, res) => {
+    ProductModel.find({}, (err,allProduct) => {
+        if(err) res.json({success: 0, message: 'can not find'});
+        else res.json(allProduct);
+    })
+})
 
 
 //3. filter by category or brand
