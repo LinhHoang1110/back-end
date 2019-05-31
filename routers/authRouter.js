@@ -21,20 +21,5 @@ authRouter.post('/login', (req, res) => {
     }
 });
 
-authRouter.delete('/logout', (req, res) => {
-    req.session.destroy();
-    res.json({ success: 1, message: "Logout success!" });
-});
-
-// authRouter.get('/me', (req, res) => {
-//     if(!req.session.userInfo){
-//         res.status(401).send({success:0,message:"ban chua dang nhap"})
-//     }
-//     else{
-//         UserModel.findOne({username:req.session.userInfo.username},"-password",(err,userInfo)=>{
-//             res.send({success:1,message: userInfo})
-//         })
-//     }
-// })
 
 module.exports = authRouter;

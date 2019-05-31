@@ -70,9 +70,8 @@ productRouter.get('/detail/:id', (req, res) => {
 })
 
 //6.add to cart
-productRouter.get('/detail/:id/:quantity', (req, res) => {
+productRouter.get('/addToCart/:id/:quantity', (req, res) => {
     var user = req.user.userFound
-    console.log(user)
     var idProduct = req.params.id;
     var quantity = req.params.quantity;
     ProductModel.findOne({ _id: idProduct }, (err, productFound) => {
@@ -209,5 +208,18 @@ productRouter.get('/removeInCart', (req, res) => {
         }
     })
 })
+
+// best seller
+productRouter.get('/bestSeller', (req, res) => {
+    ProductInfoModel.find({}).sort({quantity: 'desc'}).exec((err, products) => {
+        var listBestSeller = [];
+        for(i = 0; i < 2; i++) {
+            listBestSeller.push(products[i]);  
+        }
+        res.json(listBestSeller);
+    })
+})
+
+
 
 module.exports = productRouter;
