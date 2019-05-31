@@ -69,6 +69,17 @@ productRouter.get('/detail/:id', (req, res) => {
     })
 })
 
+
+//show_order 
+
+productRouter.get('/order', (req, res) => {
+    var user = req.user.userFound;
+    OrderModel.findOne({'user': user, 'status': '0'}, (err, orderFound) => {
+        if(err) res.json({success: 0, message:'order not found'});
+        else res.json(orderFound);
+    })
+})
+
 //6.add to cart
 productRouter.get('/addToCart/:id/:quantity', (req, res) => {
     var user = req.user.userFound
