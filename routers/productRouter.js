@@ -7,15 +7,18 @@ const UserModel = require('../models/users');
 const ProductModel = require('../models/product');
 const ProductInfoModel = require('../models/productInfo');
 const OrderModel = require('../models/order');
+const helper = require('../utils/index');
+const auth = require('./auth')
 
 // feature
 //1. create fake db productModel
 productRouter.get('/addProduct', (req, res) => {
+    
 
     var category = ['vape', 'tinhDau', 'pods', 'tankVape', 'phuKien'];
     var brand = ['joyetech', 'eleaf', 'widmec', 'smoant', 'wismec'];
     for (i = 0; i < 10; i++) {
-        ProductModel.create({
+        const data = {
             name: Math.random().toString(36).substring(2, 15),
             imgUrl: Math.random().toString(36).substring(2, 15),
             description: Math.random().toString(36).substring(2, 15),
@@ -24,8 +27,10 @@ productRouter.get('/addProduct', (req, res) => {
             id: Math.random().toString(36).substring(7),
             price: Math.floor(Math.random() * 900 + 100),
             brand: brand[Math.floor(Math.random() * brand.length)],
-            category: category[Math.floor(Math.random() * category.length)]
-        })
+            category: category[Math.floor(Math.random() * category.length)],
+        }
+        data.searchString = helper.getUnicodeText(`${data.name} ${data.brand} ${data.category}`)
+        ProductModel.create(data)
     }
     res.send("sucess!!")
 })
@@ -43,25 +48,34 @@ productRouter.get('/searchProductById', (req, res) => {
     })
 })
 
+// all product 
+productRouter.get('/showAll', (req, res) => {
+    ProductModel.find({}, (err,allProduct) => {
+        if(err) res.json({success: 0, message: 'can not find'});
+        else res.json(allProduct);
+    })
+})
 
 
 //3. filter by category or brand
 productRouter.get('/', (req, res) => {
-    var filter = {};
+    var filter = {}; 
     req.query.category ? filter.category = req.query.category : '';
     req.query.brand ? filter.brand = req.query.brand : '';
     req.query.name ? filter.name = req.query.name : '';
+    req.query.q ? filter.searchString = { $regex: helper.getSearchString(req.query.q.trim()), $options: 'i' } : "";
     ProductModel.find(filter, (err, products) => {
         if (err) res.json({ sucess: 0, message: 'not found' });
         else res.json(products)
     })
 })
 
+
 //5. show detail product 
 
 productRouter.get('/detail/:id', (req, res) => {
     var id = req.params.id;
-    ProductModel.findOne({ _id: id }, (err, product) => {
+    ProductModel.findOne({ id: id }, (err, product) => {
         if (err) res.json({ success: 0, message: 'not found' });
         else {
             res.json(product)
@@ -72,7 +86,7 @@ productRouter.get('/detail/:id', (req, res) => {
 
 //show_order 
 
-productRouter.get('/shopingCart', (req, res) => {
+productRouter.get('/order', (req, res) => {
     var user = req.user.userFound;
     OrderModel.findOne({'user': user, 'status': '0'}, (err, orderFound) => {
         if(err) res.json({success: 0, message:'order not found'});
