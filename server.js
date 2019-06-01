@@ -55,7 +55,9 @@ app.use((req,res,next)=>{
 app.use('/api', apiRouter);
 
 // Chạy Server
-app.listen(6969, (err) => {
+const port = process.env.port || 6969;
+
+app.listen(port, (err) => {
     if (err) console.log(err);
     else console.log('Server start success!');
 })
