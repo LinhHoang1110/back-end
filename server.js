@@ -14,9 +14,17 @@ const app = express();
 
 // Kết nối Database
 
+// mongoose.connect('mongodb://linh:linhdz123@ds231207.mlab.com:31207/mindx_lc_commerce', {useMongoClient: true}, function(err){
+//     if(err) {
+//         console.log('Some problem withl the connection ' +err);
+//     } else {
+//         console.log('The Mongoose connection is ready');
+//     }
+// })
+mongodb://<dbuser>:<dbpassword>@ds231207.mlab.com:31207/mindx_lc_commerce
 mongoose.connect('mongodb://linh:linhdz123@ds231207.mlab.com:31207/mindx_lc_commerce', {useMongoClient: true}, function(err){
     if(err) {
-        console.log('Some problem withl the connection ' +err);
+        console.log('Some problem with the connection ' +err);
     } else {
         console.log('The Mongoose connection is ready');
     }
@@ -29,6 +37,12 @@ var corsOptionsDelegate = function (req, callback) {
   }
   
 app.use(cors(corsOptionsDelegate));
+
+// app.use(cors({
+//     origin: ["http://localhost:3000","https://xtutor.herokuapp.com"],
+//     credentials: true
+//   }));
+  
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
