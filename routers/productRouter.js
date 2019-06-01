@@ -15,7 +15,7 @@ productRouter.get('/addProduct', (req, res) => {
     var category = ['vape', 'tinhDau', 'pods', 'tankVape', 'phuKien'];
     var brand = ['joyetech', 'eleaf', 'widmec', 'smoant', 'wismec'];
     for (i = 0; i < 10; i++) {
-        ProductModel, ProductInfoModel.create({
+        ProductModel.create({
             name: Math.random().toString(36).substring(2, 15),
             imgUrl: Math.random().toString(36).substring(2, 15),
             description: Math.random().toString(36).substring(2, 15),
