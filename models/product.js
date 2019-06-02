@@ -5,7 +5,14 @@ const ProductModel = new Schema({
     name: {type:String, required:true},
     imgUrl : {type: String, required: true},
     description: String,
-    review: String,
+    review: [{
+        user : {
+            type: Schema.Types.ObjectId,
+            ref: 'user',
+        },
+        
+    }],
+
     quantity: Number,
     id: String,
     price: {type: Number},

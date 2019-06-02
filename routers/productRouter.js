@@ -14,7 +14,6 @@ const auth = require('./auth')
 //1. create fake db productModel
 productRouter.get('/addProduct', (req, res) => {
     
-
     var category = ['vape', 'tinhDau', 'pods', 'tankVape', 'phuKien'];
     var brand = ['joyetech', 'eleaf', 'widmec', 'smoant', 'wismec'];
     for (i = 0; i < 10; i++) {
@@ -57,7 +56,7 @@ productRouter.get('/showAll', (req, res) => {
 })
 
 
-//3. filter by category or brand
+// filter by category or brand
 productRouter.get('/', (req, res) => {
     var filter = {}; 
     req.query.category ? filter.category = req.query.category : '';
@@ -71,7 +70,7 @@ productRouter.get('/', (req, res) => {
 })
 
 
-//5. show detail product 
+// show detail product 
 
 productRouter.get('/detail/:id', (req, res) => {
     var id = req.params.id;
@@ -106,6 +105,18 @@ productRouter.get('/bestSeller', (req, res) => {
     })
 })
 
+// save review 
+productRouter.post('/review', auth, (req, res) => {
+    var reviewData = {idUser : req.body.idUser, comment : req.body.comment, userName : req.body.username};
+
+    ProductModel.findOne({_id : req.body.idProduct}, (err, product) => {
+        if(err) res.json({success: 0, message: "not found product"});
+        else {
+            product.review.push(reviewData);
+            res.json({success: 1, message:product.review})
+        }
+    })
+})
 
 
 module.exports = productRouter;
