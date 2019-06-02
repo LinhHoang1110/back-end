@@ -10,7 +10,8 @@ const ProductModel = new Schema({
     id: String,
     price: {type: Number},
     category: String,
-    brand: String
+    brand: String,
+    searchString: String
     
 })
 module.exports = mongoose.model('product',ProductModel);
