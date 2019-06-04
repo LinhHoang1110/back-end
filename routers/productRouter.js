@@ -86,11 +86,11 @@ productRouter.get('/detail/:id', (req, res) => {
 
 //show_order 
 
-productRouter.get('/order', (req, res) => {
-    var user = req.user.userFound;
-    OrderModel.findOne({'user': user, 'status': '0'}, (err, orderFound) => {
-        if(err) res.json({success: 0, message:'order not found'});
-        else res.json(orderFound);
+productRouter.post('/addOrder',auth, (req, res) => {
+    var orderInfo = req.body;
+    OrderModel.create(orderInfo,(err,order) => {
+        if(err) res.json({success:0,message:"can not create"});
+        else res.json({success: 1,message: "create success"})
     })
 })
 
