@@ -86,8 +86,9 @@ productRouter.get('/detail/:id', (req, res) => {
 
 //show_order 
 
-productRouter.get('/order', (req, res) => {
+productRouter.post('/addOrder', (req, res) => {
     var user = req.user.userFound;
+    var orderInfo = 
     OrderModel.findOne({'user': user, 'status': '0'}, (err, orderFound) => {
         if(err) res.json({success: 0, message:'order not found'});
         else res.json(orderFound);
@@ -129,6 +130,8 @@ productRouter.post('/review', auth, (req, res) => {
             }
     });
 })
+
+
 
 
 module.exports = productRouter;
