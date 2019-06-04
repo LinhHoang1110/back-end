@@ -13,14 +13,22 @@ const apiRouter = require('./routers/apiRouter');
 const app = express();
 
 // Kết nối Database
-mongoose.connect(
-    'mongodb://localhost/shopvape',
-    { useNewUrlParser: true },
-    (err) => {
-        if (err) console.log(err)
-        else console.log('Database connect success!');
+
+// mongoose.connect('mongodb://linh:linhdz123@ds231207.mlab.com:31207/mindx_lc_commerce', {useMongoClient: true}, function(err){
+//     if(err) {
+//         console.log('Some problem withl the connection ' +err);
+//     } else {
+//         console.log('The Mongoose connection is ready');
+//     }
+// })
+mongodb://<dbuser>:<dbpassword>@ds231207.mlab.com:31207/mindx_lc_commerce
+mongoose.connect('mongodb://linh:linhdz123@ds231207.mlab.com:31207/mindx_lc_commerce', {useMongoClient: true}, function(err){
+    if(err) {
+        console.log('Some problem with the connection ' +err);
+    } else {
+        console.log('The Mongoose connection is ready');
     }
-);
+})
 
 var corsOptionsDelegate = function (req, callback) {
     var corsOptions;
@@ -29,21 +37,14 @@ var corsOptionsDelegate = function (req, callback) {
   }
   
 app.use(cors(corsOptionsDelegate));
+
+app.use(cors({
+    origin: ["http://localhost:3000","https://lc-commerce.herokuapp.com"],
+    credentials: true
+  }));
+  
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session({
-    // 4 Option cơ bản chủ yếu sẽ dùng
-    secret: "nomeaning", // Lưu trữ cookie của trình duyệt
-    resave: false, // Thuộc tính mỗi lần truy cập vào có ghi đè dữ liệu không
-    saveUninitialized: false, // không save nếu người dùng không tương tác với dữ liệu
-    cookie: {
-        secure: false,
-        httpOnly: false,
-        maxAge: 7 * 24 * 60 * 60 * 1000 // Hạn sử dụng Cookie
-    }
-}));
-
-
 
 // Routes
 
@@ -55,7 +56,9 @@ app.use((req,res,next)=>{
 app.use('/api', apiRouter);
 
 // Chạy Server
-app.listen(6969, (err) => {
+const port = process.env.PORT || 6969;
+
+app.listen(port, (err) => {
     if (err) console.log(err);
     else console.log('Server start success!');
 })
