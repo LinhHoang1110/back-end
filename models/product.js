@@ -10,7 +10,8 @@ const ProductModel = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'user',
         },
-        
+        username : String,
+        comment : String,
     }],
 
     quantity: Number,

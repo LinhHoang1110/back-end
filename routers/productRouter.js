@@ -107,15 +107,26 @@ productRouter.get('/bestSeller', (req, res) => {
 
 // save review 
 productRouter.post('/review', auth, (req, res) => {
-    var reviewData = {idUser : req.body.idUser, comment : req.body.comment, userName : req.body.username};
+    var reviewData = {user : req.body.idUser, comment : req.body.comment, userName : req.body.username};
 
-    ProductModel.findOne({_id : req.body.idProduct}, (err, product) => {
-        if(err) res.json({success: 0, message: "not found product"});
-        else {
-            product.review.push(reviewData);
-            res.json({success: 1, message:product.review})
-        }
-    })
+    // ProductModel.findOne({_id : req.body.idProduct}, (err, product) => {
+    //     if(err) res.json({success: 0, message: "not found product"});
+    //     else {
+    //         console.log(product);
+    //         product.review.push(reviewData);
+    //         product.save();
+    //         res.json({success: 1, message:product})
+    //     }
+    // });
+
+    ProductModel.findOneAndUpdate({_id : req.body.idProduct}, {$push: { review: reviewData }}, { new: true })
+        .populate("review.user")
+        .exec((err, product) => {
+            if(err) res.json({success: 0, message: "not found product"});
+            else {
+                res.json({success: 1, message:product}) 
+            }
+    });
 })
 
 
