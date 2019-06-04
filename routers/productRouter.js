@@ -14,6 +14,7 @@ const auth = require('./auth')
 //1. create fake db productModel
 productRouter.get('/addProduct', (req, res) => {
     
+
     var category = ['vape', 'tinhDau', 'pods', 'tankVape', 'phuKien'];
     var brand = ['joyetech', 'eleaf', 'widmec', 'smoant', 'wismec'];
     for (i = 0; i < 10; i++) {
