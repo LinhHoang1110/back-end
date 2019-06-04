@@ -38,10 +38,10 @@ var corsOptionsDelegate = function (req, callback) {
   
 app.use(cors(corsOptionsDelegate));
 
-app.use(cors({
-    origin: ["http://localhost:3000","https://lc-commerce.herokuapp.com"],
-    credentials: true
-  }));
+// app.use(cors({
+//     origin: ["http://localhost:3000","https://lc-commerce.herokuapp.com"],
+//     credentials: true
+//   }));
   
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
