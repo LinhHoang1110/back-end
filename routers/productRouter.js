@@ -94,18 +94,25 @@ productRouter.get('/detail/:id', (req, res) => {
 //show_order 
 
 productRouter.post('/addOrder', (req, res) => {
-    var orderInfo = req.body;
-    var product = new ProductModel();   
-    product.save(err => {
-        var order = new OrderModel(orderInfo);
-        order.save(err => {
-            OrderModel.populate(order, {path:"product"}, (err, order) => {
-                if(err) res.json({success: 0, message: "can not create order"});
-                else res.json({success: 1,message: order})
-            })
-        })
+    // var orderInfo = req.body.payment;
+    // console.log(req.body.payment)
+    
+    // console.log(req.body.payment.address)
+    var orderInfo = {
+        address : req.body.payment.payment.address,
+        email : req.body.payment.payment.email,
+        payerID : req.body.payment.payment.payerID,
+        paymentID : req.body.payment.payment.paymentID,
+        products : req.body.payment.item
+    }
+    console.log(orderInfo)
+    OrderModel.create(orderInfo, (err, order) => {
+        // console.log(order)
+        if(err) res.json({success:0, message: "create fail"});
+        else res.json({success: 1, message: order})
     })
-})
+    })
+
 
 
 // best seller
@@ -144,7 +151,7 @@ productRouter.get('/bestSeller', (req, res) => {
 })
 
 // save review 
-productRouter.post('/review', auth, (req, res) => {
+productRouter.post('/review', (req, res) => {
     var reviewData = {user : req.body.idUser, comment : req.body.comment, userName : req.body.username};
     ProductModel.findOneAndUpdate({_id : req.body.idProduct}, {$push: { review: reviewData }}, { new: true })
         .populate("review.user")

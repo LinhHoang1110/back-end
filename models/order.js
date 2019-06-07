@@ -3,12 +3,10 @@ const Schema = mongoose.Schema;
 
 const OrderModel = new Schema({
     address: Object,
+    paymentID :String,
     email: String,
     payerID: String,
-    product : {
-        type: Schema.Types.ObjectId,
-        ref : "product"
-    }
+    products : Array
 })
 
 module.exports = mongoose.model('order',OrderModel);
