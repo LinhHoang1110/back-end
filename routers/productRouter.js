@@ -138,9 +138,9 @@ productRouter.get('/bestSeller', (req, res) => {
 })
 
 // save review 
-productRouter.post('/review', (req, res) => {
-    var reviewData = { user: req.body.idUser, comment: req.body.comment, userName: req.body.username };
-    ProductModel.findOneAndUpdate({ _id: req.body.idProduct }, { $push: { review: reviewData } }, { new: true })
+productRouter.post('/review', auth, (req, res) => {
+    var reviewData = {user : req.body.idUser, comment : req.body.comment, userName : req.body.username};
+    ProductModel.findOneAndUpdate({_id : req.body.idProduct}, {$push: { review: reviewData }}, { new: true })
         .populate("review.user")
         .exec((err, product) => {
             if (err) res.json({ success: 0, message: "not found product" });
