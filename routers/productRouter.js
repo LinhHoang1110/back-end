@@ -55,21 +55,16 @@ productRouter.get('/searchProductById', (req, res) => {
 
 // filter by category or brand
 productRouter.get('/', (req, res) => {
-    const limit = req.query.perPage || 8
-	const page = req.query.page || 0;
-	const skip = limit * page
     var filter = {};
     req.query.category ? filter.category = req.query.category : '';
     req.query.brand ? filter.brand = req.query.brand : '';
     req.query.name ? filter.name = req.query.name : '';
     req.query.q ? filter.searchString = { $regex: helper.getSearchString(req.query.q.trim()), $options: 'i' } : '';
-    ProductModel.find(filter)
-    .limit(limit)
-    .skip(skip)
-    .exec((err, products) => {
-        if(err) res.json({success: 0, message: "find fail"});
-        else res.json({success: 1, message: products.length})
+    ProductModel.find(filter,(err, products) => {
+        if (err) res.json({success: 0, message: "can not find"});
+        else res.json({success: 1, message: products})
     })
+    
 })
 
 productRouter.get('/paginate', async (req, res) => {
