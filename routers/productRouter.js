@@ -9,6 +9,7 @@ const ProductInfoModel = require('../models/productInfo');
 const OrderModel = require('../models/order');
 const helper = require('../utils/index');
 const auth = require('./auth')
+const paginate = require('mongoose-paginate')
 
 
 
@@ -67,10 +68,20 @@ productRouter.get('/', (req, res) => {
     .skip(skip)
     .exec((err, products) => {
         if(err) res.json({success: 0, message: "find fail"});
-        else res.json({success: 1, message: products})
+        else res.json({success: 1, message: products.length})
     })
 })
 
+productRouter.get('/paginate', async (req, res) => {
+    const { perPage, page } = req.query;
+    const options = {
+        page : parseInt(page,10) || 1,
+        limit : parseInt(perPage,10) || 8
+    }
+    ProductModel.paginate({}, options, (err, products) => {
+        return res.json(products)
+    });
+})
 
 // show detail product 
 
