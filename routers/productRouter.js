@@ -10,11 +10,11 @@ const OrderModel = require('../models/order');
 const helper = require('../utils/index');
 const auth = require('./auth')
 
+
+
 // feature
 //1. create fake db productModel
 productRouter.get('/addProduct', (req, res) => {
-    
-
     var category = ['vape', 'tinhDau', 'pods', 'tankVape', 'phuKien'];
     var brand = ['joyetech', 'eleaf', 'widmec', 'smoant', 'wismec'];
     for (i = 0; i < 10; i++) {
@@ -49,24 +49,25 @@ productRouter.get('/searchProductById', (req, res) => {
 })
 
 // all product 
-productRouter.get('/showAll', (req, res) => {
-    ProductModel.find({}, (err,allProduct) => {
-        if(err) res.json({success: 0, message: 'can not find'});
-        else res.json(allProduct);
-    })
-})
+
 
 
 // filter by category or brand
 productRouter.get('/', (req, res) => {
-    var filter = {}; 
+    const limit = req.query.perPage || 8
+	const page = req.query.page || 0;
+	const skip = limit * page
+    var filter = {};
     req.query.category ? filter.category = req.query.category : '';
     req.query.brand ? filter.brand = req.query.brand : '';
     req.query.name ? filter.name = req.query.name : '';
-    req.query.q ? filter.searchString = { $regex: helper.getSearchString(req.query.q.trim()), $options: 'i' } : "";
-    ProductModel.find(filter, (err, products) => {
-        if (err) res.json({ sucess: 0, message: 'not found' });
-        else res.json(products)
+    req.query.q ? filter.searchString = { $regex: helper.getSearchString(req.query.q.trim()), $options: 'i' } : '';
+    ProductModel.find(filter)
+    .limit(limit)
+    .skip(skip)
+    .exec((err, products) => {
+        if(err) res.json({success: 0, message: "find fail"});
+        else res.json({success: 1, message: products})
     })
 })
 
@@ -87,48 +88,66 @@ productRouter.get('/detail/:id', (req, res) => {
 //show_order 
 
 productRouter.post('/addOrder', (req, res) => {
-    var user = req.user.userFound;
-    var orderInfo = 
-    OrderModel.findOne({'user': user, 'status': '0'}, (err, orderFound) => {
-        if(err) res.json({success: 0, message:'order not found'});
-        else res.json(orderFound);
+    var orderInfo = req.body;
+    var product = new ProductModel();   
+    product.save(err => {
+        var order = new OrderModel(orderInfo);
+        order.save(err => {
+            OrderModel.populate(order, {path:"product"}, (err, order) => {
+                if(err) res.json({success: 0, message: "can not create order"});
+                else res.json({success: 1,message: order})
+            })
+        })
     })
 })
 
 
 // best seller
 productRouter.get('/bestSeller', (req, res) => {
-    ProductInfoModel.find({}).sort({quantity: 'desc'}).exec((err, products) => {
-        var listBestSeller = [];
-        for(i = 0; i < 2; i++) {
-            listBestSeller.push(products[i]);  
+    ProductModel.find({}).sort({ quantity: 'desc' }).exec((err, products) => {
+        // CODE NGU
+        // console.log(products[1].quantity)
+        // var listBestSeller = [];
+        // for ( let i = 0; i < 4; i++) {
+        //     for (let k = products.length - 1; k > 0; k--) {
+        //         // console.log(products[k]);
+        //         for (let j = 0; j < listBestSeller.length; j++) {
+        //             console.log(listBestSeller[j])
+        //             if (products[k].quantity != 0 & producs[k] != listBestSeller[j]) {
+        //                 listBestSeller.push(products[k]);
+        //             }
+        //         }
+        //     }
+        // }
+        // res.json(listBestSeller);
+        if (err) res.json({ success: 0, message: 'can not find products' })
+        else {
+            products = products.reverse();
+            var listBestSeller = [];
+            for (let i = 0; i < products.length; i++) {
+                if (Number(products[i].quantity) != 0 && !listBestSeller.includes(products[i])) {
+                    listBestSeller.push(products[i]);
+                }
+                if (listBestSeller.length == 4) {
+                    break;
+                }
+            }
+            res.json(listBestSeller);
         }
-        res.json(listBestSeller);
     })
 })
 
 // save review 
-productRouter.post('/review', auth, (req, res) => {
-    var reviewData = {user : req.body.idUser, comment : req.body.comment, userName : req.body.username};
-
-    // ProductModel.findOne({_id : req.body.idProduct}, (err, product) => {
-    //     if(err) res.json({success: 0, message: "not found product"});
-    //     else {
-    //         console.log(product);
-    //         product.review.push(reviewData);
-    //         product.save();
-    //         res.json({success: 1, message:product})
-    //     }
-    // });
-
-    ProductModel.findOneAndUpdate({_id : req.body.idProduct}, {$push: { review: reviewData }}, { new: true })
+productRouter.post('/review', (req, res) => {
+    var reviewData = { user: req.body.idUser, comment: req.body.comment, userName: req.body.username };
+    ProductModel.findOneAndUpdate({ _id: req.body.idProduct }, { $push: { review: reviewData } }, { new: true })
         .populate("review.user")
         .exec((err, product) => {
-            if(err) res.json({success: 0, message: "not found product"});
+            if (err) res.json({ success: 0, message: "not found product" });
             else {
-                res.json({success: 1, message:product}) 
+                res.json({ success: 1, message: product })
             }
-    });
+        });
 })
 
 

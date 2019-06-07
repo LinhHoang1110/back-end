@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+// var mongoosePaginate = require('mongoose-paginate');
 
 const ProductModel = new Schema({
-    name: {type:String, required:true},
-    imgUrl : {type: String, required: true},
+    name: {type:String},
+    imgUrl : {type: String},
     description: String,
     review: [{
         user : {
@@ -13,7 +14,6 @@ const ProductModel = new Schema({
         username : String,
         comment : String,
     }],
-
     quantity: Number,
     id: String,
     price: {type: Number},
@@ -22,4 +22,5 @@ const ProductModel = new Schema({
     searchString : String
     
 })
+// ProductModel.plugin(mongoosePaginate);
 module.exports = mongoose.model('product',ProductModel);
