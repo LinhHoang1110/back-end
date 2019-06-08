@@ -55,9 +55,6 @@ productRouter.get('/searchProductById', (req, res) => {
 
 // filter by category or brand
 productRouter.get('/', (req, res) => {
-    const limit = req.query.perPage || 8
-	const page = req.query.page || 0;
-	const skip = limit * page
     var filter = {};
     req.query.category ? filter.category = req.query.category : '';
     req.query.brand ? filter.brand = req.query.brand : '';
