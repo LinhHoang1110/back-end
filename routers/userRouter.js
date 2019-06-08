@@ -5,6 +5,7 @@ const userRouter = Router();
 const UserModel = require("../models/users");
 
 userRouter.post('/register', (req, res) => {
+    console.log(req.body)
     const newUser = req.body;
     const hashPassword = bcrypt.hashSync(newUser.password, 12);
     newUser.password = hashPassword;
